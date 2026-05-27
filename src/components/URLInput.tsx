@@ -23,9 +23,14 @@ export default function URLInput({
         return;
       }
 
+      const normalizedUrl = /^https?:\/\//i.test(trimmedUrl)
+        ? trimmedUrl
+        : `https://${trimmedUrl}`;
+
       try {
-        new URL(trimmedUrl);
-        onSubmit(trimmedUrl);
+        new URL(normalizedUrl);
+        setUrl(normalizedUrl);
+        onSubmit(normalizedUrl);
       } catch {
         setError('URL inválida. Asegúrate de incluir http:// o https://');
       }
@@ -42,7 +47,8 @@ export default function URLInput({
           </label>
           <input
             id="url"
-            type="url"
+            type="text"
+            inputMode="url"
             value={url}
             onChange={(e) => {
               setUrl(e.target.value);
@@ -62,7 +68,7 @@ export default function URLInput({
 
         <button
           type="submit"
-          disabled={isLoading || !url.trim()}
+          disabled={isLoading}
           className="w-full px-6 py-3 bg-gradient-accent text-white font-semibold rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity flex items-center justify-center gap-2"
         >
           {isLoading ? (

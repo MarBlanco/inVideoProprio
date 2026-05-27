@@ -1,6 +1,9 @@
 import { OpenAI } from 'openai';
-import { VideoScript, Scene } from '@/types';
+import { promises as fs } from 'fs';
+import path from 'path';
+import { AudioData, VideoScript, Scene } from '@/types';
 import { CONSTANTS } from '@/utils/constants';
+import { ensureDirectory, generateUniqueFilename, getTempDirectory } from '@/utils/file-utils';
 import { ValidationError } from '@/utils/validators';
 
 function getOpenAIClient(): OpenAI {
@@ -10,6 +13,43 @@ function getOpenAIClient(): OpenAI {
   }
 
   return new OpenAI({ apiKey });
+}
+
+export async function generateAudioWithOpenAI(text: string): Promise<AudioData> {
+  try {
+    const openai = getOpenAIClient();
+    const model = process.env.OPENAI_TTS_MODEL || 'gpt-4o-mini-tts';
+    const voice = process.env.OPENAI_TTS_VOICE || 'alloy';
+
+    const response = await openai.audio.speech.create({
+      model,
+      voice,
+      input: text,
+      response_format: 'mp3'
+    });
+
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBuffer = Buffer.from(arrayBuffer);
+
+    const tempDir = getTempDirectory();
+    await ensureDirectory(tempDir);
+
+    const filename = generateUniqueFilename('mp3');
+    const filePath = path.join(tempDir, filename);
+
+    await fs.writeFile(filePath, audioBuffer);
+
+    const duration = Math.ceil((text.split(/\s+/).length / CONSTANTS.SCRIPT.WORDS_PER_SECOND) * 1000) / 1000;
+
+    return {
+      filePath,
+      duration,
+      format: 'mp3'
+    };
+  } catch (error) {
+    console.error('Error generating audio with OpenAI:', error);
+    throw new ValidationError('Error al generar audio con OpenAI. Verifica tu clave y el modelo de TTS.');
+  }
 }
 
 export async function generateVideoScript(articleContent: string, title: string): Promise<VideoScript> {

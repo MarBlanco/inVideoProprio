@@ -68,33 +68,39 @@ export default function VideoGenerator() {
     }
   }, [videoUrl]);
 
-  if (videoUrl) {
-    return <VideoPreview videoUrl={videoUrl} onDownload={handleDownload} />;
-  }
+  return (
+    <div className="w-full max-w-4xl mx-auto">
+      <URLInput onSubmit={handleGenerate} isLoading={isLoading} />
 
-  if (progress) {
-    return <LoadingIndicator step={progress.step} message={progress.message} />;
-  }
-
-  if (error) {
-    return (
-      <div className="w-full max-w-2xl mx-auto p-6">
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-6">
-          <h3 className="text-red-400 font-semibold mb-2">Error</h3>
-          <p className="text-red-300 text-sm mb-4">{error}</p>
-          <button
-            onClick={() => {
-              setError(null);
-              setProgress(null);
-            }}
-            className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-colors"
-          >
-            Intentar de nuevo
-          </button>
+      {progress && (
+        <div className="mt-6">
+          <LoadingIndicator step={progress.step} message={progress.message} />
         </div>
-      </div>
-    );
-  }
+      )}
 
-  return <URLInput onSubmit={handleGenerate} isLoading={isLoading} />;
+      {error && (
+        <div className="w-full max-w-2xl mx-auto p-6">
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-6">
+            <h3 className="text-red-400 font-semibold mb-2">Error</h3>
+            <p className="text-red-300 text-sm mb-4">{error}</p>
+            <button
+              onClick={() => {
+                setError(null);
+                setProgress(null);
+              }}
+              className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-colors"
+            >
+              Intentar de nuevo
+            </button>
+          </div>
+        </div>
+      )}
+
+      {videoUrl && (
+        <div className="mt-6">
+          <VideoPreview videoUrl={videoUrl} onDownload={handleDownload} />
+        </div>
+      )}
+    </div>
+  );
 }

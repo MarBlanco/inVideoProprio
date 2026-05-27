@@ -22,6 +22,8 @@ yarn-error.log*
 
 uploads/
 temp/
+public/temp/
+public/outputs/
 videos/
 *.mp4
 *.mp3

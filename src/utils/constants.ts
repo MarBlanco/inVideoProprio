@@ -21,7 +21,7 @@ export const CONSTANTS = {
     CTA_DURATION: 2
   },
   ELEVENLABS: {
-    MODEL_ID: 'eleven_monolingual_v1',
+    MODEL_ID: 'eleven_monolingual_v2',
     VOICE_ID: '21m00Tcm4TlvDq8ikWAM',
     STABILITY: 0.5,
     SIMILARITY_BOOST: 0.75
